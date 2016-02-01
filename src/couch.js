@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Debug from 'debug';
-import helpers from './helpers.js';
+import Helpers from './helpers.js';
 
 const debug = new Debug('loopback:connector:couch');
 
@@ -23,7 +23,7 @@ class CouchConnector {
 
     var settings = dataSource.settings || {};
     this.settings = settings;
-    helpers.optimizeSettings(settings);
+    Helpers.optimizeSettings(settings);
 
     var design = {views:
       {
@@ -53,7 +53,7 @@ class CouchConnector {
       this._nanoAdmin = require('nano')(this.buildAuthUrl(settings.auth));
     }
 
-    helpers.updateDesign(this._nanoAdmin, '_design/loopback', design);
+    Helpers.updateDesign(this._nanoAdmin, '_design/loopback', design);
     this._models = {};
     this.name = 'couchdb';
     if (settings.views && _.isArray(settings.views)) {
@@ -111,7 +111,7 @@ class CouchConnector {
       var value = descr.properties[propName];
       if (value.index) {
         hasIndexes = true;
-        var viewName = helpers.viewName(propName);
+        var viewName = Helpers.viewName(propName);
         design.views[viewName] =
         {
           map: 'function (doc) { if (doc.loopbackModel === \'' + modelName + '\' && doc.'+propName + ') return emit(doc.' + propName + ', null); }'
@@ -119,8 +119,8 @@ class CouchConnector {
       }
     }
     ;if (hasIndexes) {
-      var designName = '_design/' + helpers.designName(modelName);
-      return helpers.updateDesign(this._nanoAdmin, designName, design);
+      var designName = '_design/' + Helpers.designName(modelName);
+      return Helpers.updateDesign(this._nanoAdmin, designName, design);
     }
   }
 
@@ -142,7 +142,7 @@ class CouchConnector {
       }
       // Undo the effects of savePrep as data object is the only one
       // that the Loopback.io can access.
-      helpers.undoPrep(data);
+      Helpers.undoPrep(data);
       // Update the data object with the revision returned by CouchDb.
       data._rev = rsp.rev;
       return callback && callback(null, rsp.id, rsp.rev);
@@ -169,7 +169,7 @@ class CouchConnector {
       if (err) {
         return callback && callback(err);
       }
-      helpers.merge(docsFromDb, data);
+      Helpers.merge(docsFromDb, data);
       if (!_.isArray(docsFromDb)) {
         docsFromDb = [docsFromDb];
       }
@@ -195,7 +195,7 @@ class CouchConnector {
       if (err) {
         return callback && callback(err);
       }
-      return this.save(model, helpers.merge(doc, attributes), function(err, rsp) {
+      return this.save(model, Helpers.merge(doc, attributes), function(err, rsp) {
         if (err) {
           return callback && callback(err);
         }
@@ -280,8 +280,8 @@ class CouchConnector {
         var value = where[propName];
         if (value && (props[propName] != null) && props[propName].index) {
           // Use the design and view for the model and propName
-          designName = helpers.designName(model);
-          viewName = helpers.viewName(propName);
+          designName = Helpers.designName(model);
+          viewName = Helpers.viewName(propName);
           // support loopback passing inq key arrays
           if ((value.inq != null)) {
             params.keys = [];
@@ -370,8 +370,8 @@ class CouchConnector {
         for (var i = 0, key; i < orders.length; i++) {
           key = orders[i];
           orders[i] =
-            {reverse: helpers.reverse(key),
-            key: helpers.stripOrder(key)
+            {reverse: Helpers.reverse(key),
+            key: Helpers.stripOrder(key)
             };
         }
 
@@ -410,7 +410,7 @@ class CouchConnector {
 
 
   forDB(model, data = {}) {
-    helpers.savePrep(model, data);
+    Helpers.savePrep(model, data);
     var props = this._models[model].properties;
     for (var k in props) {
       var v = props[k];
@@ -425,7 +425,7 @@ class CouchConnector {
     if (!data) {
       return data;
     }
-    helpers.undoPrep(data);
+    Helpers.undoPrep(data);
     var props = this._models[model].properties;
     for (var k in props) {
       var v = props[k];
