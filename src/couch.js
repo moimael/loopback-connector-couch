@@ -1,8 +1,6 @@
-import _ from 'lodash';
-import Debug from 'debug';
-import Helpers from './helpers.js';
-
-const debug = new Debug('loopback:connector:couch');
+var {_} = require('lodash');
+var debug = require('debug')('loopback:connector:couch');
+var helpers = require('./helpers.js');
 
 // api
 exports.initialize = function(dataSource, callback) {
@@ -23,7 +21,7 @@ class CouchConnector {
 
     var settings = dataSource.settings || {};
     this.settings = settings;
-    Helpers.optimizeSettings(settings);
+    helpers.optimizeSettings(settings);
 
     var design = {views:
       {
@@ -53,7 +51,7 @@ class CouchConnector {
       this._nanoAdmin = require('nano')(this.buildAuthUrl(settings.auth));
     }
 
-    Helpers.updateDesign(this._nanoAdmin, '_design/loopback', design);
+    helpers.updateDesign(this._nanoAdmin, '_design/loopback', design);
     this._models = {};
     this.name = 'couchdb';
     if (settings.views && _.isArray(settings.views)) {
@@ -111,7 +109,7 @@ class CouchConnector {
       var value = descr.properties[propName];
       if (value.index) {
         hasIndexes = true;
-        var viewName = Helpers.viewName(propName);
+        var viewName = helpers.viewName(propName);
         design.views[viewName] =
         {
           map: 'function (doc) { if (doc.loopbackModel === \'' + modelName + '\' && doc.'+propName + ') return emit(doc.' + propName + ', null); }'
@@ -119,8 +117,8 @@ class CouchConnector {
       }
     }
     ;if (hasIndexes) {
-      var designName = '_design/' + Helpers.designName(modelName);
-      return Helpers.updateDesign(this._nanoAdmin, designName, design);
+      var designName = '_design/' + helpers.designName(modelName);
+      return helpers.updateDesign(this._nanoAdmin, designName, design);
     }
   }
 
@@ -142,7 +140,7 @@ class CouchConnector {
       }
       // Undo the effects of savePrep as data object is the only one
       // that the Loopback.io can access.
-      Helpers.undoPrep(data);
+      helpers.undoPrep(data);
       // Update the data object with the revision returned by CouchDb.
       data._rev = rsp.rev;
       return callback && callback(null, rsp.id, rsp.rev);
@@ -169,7 +167,7 @@ class CouchConnector {
       if (err) {
         return callback && callback(err);
       }
-      Helpers.merge(docsFromDb, data);
+      helpers.merge(docsFromDb, data);
       if (!_.isArray(docsFromDb)) {
         docsFromDb = [docsFromDb];
       }
@@ -195,7 +193,7 @@ class CouchConnector {
       if (err) {
         return callback && callback(err);
       }
-      return this.save(model, Helpers.merge(doc, attributes), function(err, rsp) {
+      return this.save(model, helpers.merge(doc, attributes), function(err, rsp) {
         if (err) {
           return callback && callback(err);
         }
@@ -280,8 +278,8 @@ class CouchConnector {
         var value = where[propName];
         if (value && (props[propName] != null) && props[propName].index) {
           // Use the design and view for the model and propName
-          designName = Helpers.designName(model);
-          viewName = Helpers.viewName(propName);
+          designName = helpers.designName(model);
+          viewName = helpers.viewName(propName);
           // support loopback passing inq key arrays
           if ((value.inq != null)) {
             params.keys = [];
@@ -370,8 +368,8 @@ class CouchConnector {
         for (var i = 0, key; i < orders.length; i++) {
           key = orders[i];
           orders[i] =
-            {reverse: Helpers.reverse(key),
-            key: Helpers.stripOrder(key)
+            {reverse: helpers.reverse(key),
+            key: helpers.stripOrder(key)
             };
         }
 
@@ -410,7 +408,7 @@ class CouchConnector {
 
 
   forDB(model, data = {}) {
-    Helpers.savePrep(model, data);
+    helpers.savePrep(model, data);
     var props = this._models[model].properties;
     for (var k in props) {
       var v = props[k];
@@ -425,7 +423,7 @@ class CouchConnector {
     if (!data) {
       return data;
     }
-    Helpers.undoPrep(data);
+    helpers.undoPrep(data);
     var props = this._models[model].properties;
     for (var k in props) {
       var v = props[k];

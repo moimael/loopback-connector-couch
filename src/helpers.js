@@ -1,5 +1,7 @@
-// helpers
-export default class Helpers {
+var {_} = require('lodash');
+
+// Helpers
+module.exports = class Helpers {
   static optimizeSettings(settings) {
     settings.hostname = settings.hostname || settings.host || '127.0.0.1';
     settings.protocol = settings.protocol || 'http';
@@ -85,7 +87,7 @@ export default class Helpers {
     // Add the design document to the database or update it if it already exists.
     return db.get(designName, (err, designDoc) => {
       if (err && err.error !== 'not_found') {
-        return helpers.invokeCallbackOrLogError(callback, err, designDoc);
+        return Helpers.invokeCallbackOrLogError(callback, err, designDoc);
       }
 
       // Update the design doc
@@ -94,14 +96,14 @@ export default class Helpers {
       } else {
         // We only update the design when its views have changed - this avoids rebuilding the views.
         if (_.isEqual(designDoc.views, design.views)) {
-          return helpers.invokeCallbackOrLogError(callback, null, designDoc);
+          return Helpers.invokeCallbackOrLogError(callback, null, designDoc);
         }
         designDoc.views = design.views;
       }
 
       // Insert the design doc into the database.
       return db.insert(designDoc, designName, (err, insertedDoc) => {
-        return helpers.invokeCallbackOrLogError(callback, err, insertedDoc);
+        return Helpers.invokeCallbackOrLogError(callback, err, insertedDoc);
       });
     });
   }

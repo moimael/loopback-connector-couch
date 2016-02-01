@@ -1,13 +1,11 @@
-var gulp = require("gulp");
-var sourcemaps = require("gulp-sourcemaps");
-var babel = require("gulp-babel");
-var concat = require("gulp-concat");
+var gulp = require('gulp');
+var sourcemaps = require('gulp-sourcemaps');
+var babel = require('gulp-babel');
 
-gulp.task("default", function () {
-  return gulp.src("src/**/*.js")
+gulp.task('default', function () {
+  return gulp.src('src/**/*.js')
     .pipe(sourcemaps.init())
     .pipe(babel())
-    .pipe(concat("couch.js"))
-    .pipe(sourcemaps.write("."))
-    .pipe(gulp.dest("lib"));
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest('lib'));
 });
