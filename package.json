@@ -1,0 +1,42 @@
+{
+  "name": "loopback-connector-couch",
+  "version": "0.1.1",
+  "description": "CouchDB adapter for Loopback.io",
+  "keywords": [
+    "strongloop",
+    "loopback",
+    "connector",
+    "couch",
+    "CouchDB",
+    "loopback-connector"
+  ],
+  "main": "index.js",
+  "contributors": [
+    {
+      "name": "Maël Lavault",
+      "email": "mael.lavault@mailz.org"
+    },
+    {
+      "name": "Matteo Angeloni",
+      "email": "mattange@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "debug": "^2.1.0",
+    "lodash": "^2.4.1",
+    "nano": "^6.0.2"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-sourcemaps": "^1.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moimael/loopback-connector-couch.git"
+  },
+  "author": "Matteo Angeloni <mattange@gmail.com>",
+  "license": "MIT"
+}
