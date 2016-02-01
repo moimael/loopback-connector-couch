@@ -318,7 +318,7 @@ class CouchConnector {
       debug(docs);
 
       if (where = ((typeof filter !== 'undefined' && filter !== null) ? filter.where : undefined)) {
-        docs = _.select(docs, (doc) => {
+        docs = _.filter(docs, (doc) => {
           var isMatch = true;
           for (var k in where) {
             // CouchDb stores dates as Unix time
