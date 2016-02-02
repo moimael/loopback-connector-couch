@@ -23,8 +23,8 @@ class CouchConnector {
     this.settings = settings;
     helpers.optimizeSettings(settings);
 
-    var design = {views:
-      {
+    var design = {
+      views: {
         by_model: {
           map: 'function (doc) { if (doc.loopbackModel) return emit(doc.loopbackModel, null); }'
         }
@@ -86,12 +86,12 @@ class CouchConnector {
 
   getMetadata() {
     if (!this._metaData) {
-      this._metaData =
-        {types: this.getTypes(),
+      this._metaData = {
+        types: this.getTypes(),
         defaultIdType: this.getDefaultIdType(),
         isRelational: this.relational,
         schemaForSettings: {}
-        };
+      };
     }
     return this._metaData;
   }
@@ -100,23 +100,25 @@ class CouchConnector {
     var modelName = descr.model.modelName;
 
     this._models[modelName] = descr;
-    descr.properties._rev = {type: String};
+    descr.properties._rev = {
+      type: String
+    };
     // Add index views for schemas that have indexes
-    var design =
-      {views: {}}
-    ;var hasIndexes = false;
+    var design = {
+      views: {}
+    };
+    var hasIndexes = false;
     for (var propName in descr.properties) {
       var value = descr.properties[propName];
       if (value.index) {
         hasIndexes = true;
         var viewName = helpers.viewName(propName);
-        design.views[viewName] =
-        {
+        design.views[viewName] = {
           map: 'function (doc) { if (doc.loopbackModel === \'' + modelName + '\' && doc.'+propName + ') return emit(doc.' + propName + ', null); }'
         };
       }
     }
-    ;if (hasIndexes) {
+    if (hasIndexes) {
       var designName = '_design/' + helpers.designName(modelName);
       return helpers.updateDesign(this._nanoAdmin, designName, design);
     }
@@ -246,7 +248,9 @@ class CouchConnector {
       // support include filter
       if ((typeof filter !== 'undefined' && filter !== null) ? filter.include : undefined) {
         return this.findById(model, id, (err, result) => {
-          if (err) { return callback(err); }
+          if (err) {
+            return callback(err);
+          }
           return this._models[model].model.include(result, filter.include, callback);
         });
       } else {
@@ -254,10 +258,11 @@ class CouchConnector {
       }
     }
 
-    var params =
-      {keys: [model],
+    var params = {
+      keys: [model],
       include_docs: true
-      };
+    };
+
     if (filter.offset && !filter.where) {
       params.skip = filter.offset;
     }
@@ -367,22 +372,25 @@ class CouchConnector {
 
         for (var i = 0, key; i < orders.length; i++) {
           key = orders[i];
-          orders[i] =
-            {reverse: helpers.reverse(key),
+          orders[i] = {
+            reverse: helpers.reverse(key),
             key: helpers.stripOrder(key)
-            };
+          };
         }
 
         docs.sort(sorting.bind(orders));
       }
 
+      var maxDocsNum;
+      var startDocsNum;
+
       if (((typeof filter !== 'undefined' && filter !== null) ? filter.limit : undefined) && ((typeof filter !== 'undefined' && filter !== null) ? filter.where : undefined)) {
-        var maxDocsNum = filter.limit;
+        maxDocsNum = filter.limit;
       } else {
         maxDocsNum = docs.length;
       }
       if (((typeof filter !== 'undefined' && filter !== null) ? filter.offset : undefined) && ((typeof filter !== 'undefined' && filter !== null) ? filter.where : undefined)) {
-        var startDocsNum = filter.offset;
+        startDocsNum = filter.offset;
       } else {
         startDocsNum = 0;
       }
@@ -566,17 +574,18 @@ class CouchConnector {
       type: 'array'
     };
     fn.shared = true;
-    fn.http =
-      {path: '/queryView',
+    fn.http = {
+      path: '/queryView',
       verb: 'get'
-      };
+    };
     fn.description = 'Query a CouchDB view based on design document name, view name and keys.';
     return fn;
   }
 
   buildAuthUrl(auth) {
+    var authString;
     if (auth && (auth.username || auth.user) && (auth.password || auth.pass)) {
-      var authString = (auth.username || auth.user) + ':' + (auth.password || auth.pass) + '@';
+      authString = (auth.username || auth.user) + ':' + (auth.password || auth.pass) + '@';
     } else {
       authString = '';
     }
