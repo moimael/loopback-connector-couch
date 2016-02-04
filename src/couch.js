@@ -4,8 +4,11 @@ var helpers = require('./helpers.js');
 
 // api
 exports.initialize = function(dataSource, callback) {
-  var connector = new CouchConnector(dataSource);
-  return callback && process.nextTick(callback);
+  var connector = new CouchConnector(dataSource, callback);
+
+  if (callback) {
+    dataSource.connector.connect(callback);
+  }
 };
 
 //Constructor and useful reference functions
@@ -22,14 +25,6 @@ class CouchConnector {
     var settings = dataSource.settings || {};
     this.settings = settings;
     helpers.optimizeSettings(settings);
-
-    var design = {
-      views: {
-        by_model: {
-          map: 'function (doc) { if (doc.loopbackModel) return emit(doc.loopbackModel, null); }'
-        }
-      }
-    };
 
     if (((ref = settings.auth) != null) ? ref.reader : undefined) {
       this._nanoReader = require('nano')(this.buildAuthUrl(settings.auth.reader));
@@ -51,7 +46,6 @@ class CouchConnector {
       this._nanoAdmin = require('nano')(this.buildAuthUrl(settings.auth));
     }
 
-    helpers.updateDesign(this._nanoAdmin, '_design/loopback', design);
     this._models = {};
     this.name = 'couchdb';
     if (settings.views && _.isArray(settings.views)) {
@@ -125,6 +119,20 @@ class CouchConnector {
   }
 
 //Loopback.io prototype functions
+  connect(callback) {
+    var design = {
+      views: {
+        by_model: {
+          map: 'function (doc) { if (doc.loopbackModel) return emit(doc.loopbackModel, null); }'
+        }
+      }
+    };
+
+    helpers.updateDesign(this._nanoAdmin, '_design/loopback', design, (err, res) => {
+      return callback && callback(err, res);
+    });
+  };
+
   create(model, data, callback) {
     debug('CouchDB create');
     return this.save(model, data, callback);
