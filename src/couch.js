@@ -352,7 +352,7 @@ class CouchConnector {
             }
             // support loopback inq queries
             if (where[k].inq) {
-              if (!_.contains(where[k].inq, doc[k])) {
+              if (!_.includes(where[k].inq, doc[k])) {
                 isMatch = false;
               }
             } else {
